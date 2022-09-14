@@ -1,80 +1,83 @@
 
 import 'package:quick_access/utils/shell32.dart' as shell32;
 
-extension on Map {
-
-  String? getString(String key) {
-
-    dynamic value = this[key];
-    if(value == null) return null;
-    
-    if(value is String) {
-      value = value.trim();
-      if(value.isEmpty) return null;
-      return value;
-    }else{
-      return null;
-    }
-
-  }
-
-}
-
 class QResource {
 
-  final String name;
-  final String image;
-  final List<QResource>? children;
+  String name;
+  String image;
 
-  final String file;
-  final String? params;
-  final String? dir; 
+  String program;
+  String launchArguments;
+  String workingDirectory;
 
-  final bool isChild;
+  List<QResource> children;
 
   QResource({
     required this.name,
     required this.image,
-    this.children,
-    required this.file,
-    this.params,
-    this.dir,
-    this.isChild = false,
+    required this.program,
+    required this.launchArguments,
+    required this.workingDirectory,
+    required this.children,
   });
 
-  bool get hasChildren => children != null && children!.isNotEmpty;
+  QResource.empty() : name = '', image = '', program = '', launchArguments = '', workingDirectory = '', children = [];
 
-  void open() {
-    shell32.shellExecute(
-      file: file,
-      params: params,
-      dir: dir
+  int open() {
+    return shell32.shellExecute(
+      operation: 'open',
+      file: program,
+      params: launchArguments,
+      dir: workingDirectory,
     );
   }
 
-  @override
-  String toString() {
-    return name;
+  bool get hasChildren => children.isNotEmpty;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'icon': image,
+      'app': program,
+      'args': launchArguments,
+      'dir': workingDirectory,
+      'children': children.map((e) => e.toJson()).toList(),
+    };
   }
 
-  static QResource fromMap(Map<String, dynamic> map, [bool isChild = false]) {
-
-    List<QResource>? children;
-    if(map.containsKey('children')) {
-      List<dynamic> c = map['children'];
-      children = c.map((e) => QResource.fromMap(e, true)).toList();
-    }
-
+  static QResource fromJson(Map<String, dynamic> map) {
     return QResource(
-      name: map['name'],
-      image: map['image'],
-      children: children,
-      file: map['file'],
-      params: map.getString('params'),
-      dir: map.getString('dir'),
-      isChild: isChild,
+      name: map.nonEmptyString('name'),
+      image: map.nonEmptyString('icon'),
+      program: map.nonEmptyString('app'),
+      launchArguments: map.nonEmptyString('args'),
+      workingDirectory: map.nonEmptyString('dir'),
+      children: _getChildren(map, 'children'),
     );
+  }
 
+}
+
+List<QResource> _getChildren(Map<String, dynamic> map, String key) {
+
+  if(!map.containsKey(key)) return [];
+
+  dynamic value = map[key];
+  if(value is List) {
+    return value.map((e) => QResource.fromJson(e)).toList();
+  }
+
+  return [];
+
+}
+
+extension on Map {
+
+  String nonEmptyString(String key) {
+    dynamic value = this[key];
+    if(value == null) return '';
+    if(value is String) return value.trim();
+    return '';
   }
 
 }

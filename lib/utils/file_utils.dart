@@ -1,8 +1,10 @@
 
+String get homeDir => 'C:\\Users\\josip\\Documents\\Quick access';
+
 String getResourceFilePath() {
-  return 'C:\\Users\\josip\\Desktop\\Quick access\\resources.json';
+  return '$homeDir\\resources.json';
 }
 
 String getIconFilePath(String iconName) {
-  return 'C:\\Users\\josip\\Desktop\\Quick access\\$iconName';
+  return '$homeDir\\icons\\$iconName';
 }

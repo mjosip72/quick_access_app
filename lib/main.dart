@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
@@ -17,9 +18,11 @@ void main() async{
 
   ThemeData theme = ThemeData(
     brightness: Brightness.light,
-    primarySwatch: Colors.green,
+    primarySwatch: Colors.blue,
     //scaffoldBackgroundColor: const Color.fromRGBO(230, 230, 230, 0.6),
-    scaffoldBackgroundColor: Colors.white.withOpacity(0.6),
+    //scaffoldBackgroundColor: Colors.white.withOpacity(0.6),
+    scaffoldBackgroundColor: Colors.white,
+    useMaterial3: true,
   );
 
   runApp(GetMaterialApp(

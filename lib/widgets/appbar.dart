@@ -1,17 +1,21 @@
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:quick_access/controllers/main_app.dart';
 
-class CustomAppBar extends StatelessWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
+  static const double height = 32;
+  
   const CustomAppBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     const spacing = SizedBox(width: 8);
     return Container(
-      height: 32,
-      color: Colors.green.shade800,
+      height: height,
+      color: Colors.blue.shade800,
       child: Row(
         children: [
 
@@ -29,13 +33,16 @@ class CustomAppBar extends StatelessWidget {
 
           WindowButtonWidget(
             color: Colors.red,
-            onPressed: () => appWindow.close(),
+            onPressed: () => Get.find<MainAppController>().onAppClose(),
           ),spacing,
 
         ],
       ),
     );
   }
+  
+  @override
+  Size get preferredSize => const Size.fromHeight(height);
 
 }
 

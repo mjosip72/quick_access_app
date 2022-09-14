@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.1.0
+version: 1.0.0
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
@@ -33,7 +33,8 @@ dependencies:
     sdk: flutter
 
   get: ^4.6.5
-  url_launcher: ^6.1.5
+  reorderables:
+    git: https://github.com/mjosip72/flutter_reorderables.git
   bitsdojo_window: ^0.1.4
   flutter_acrylic: ^1.0.0+2
   ffi: ^2.0.1
@@ -100,5 +101,5 @@ flutter:
 flutter_icons:
   windows:
     generate: true
-    image_path: "icons/home.png"
+    image_path: "windows/home2.png"
     icon_size: 256

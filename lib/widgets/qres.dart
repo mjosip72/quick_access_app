@@ -1,5 +1,4 @@
 
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,8 +7,12 @@ import 'package:quick_access/models/qres.dart';
 
 import 'package:quick_access/utils/file_utils.dart' as fileUtils;
 import 'package:quick_access/widgets/qres_container.dart';
+import 'package:quick_access/widgets/qres_editor.dart';
 
 class QResourceWidget extends StatefulWidget {
+
+  static const double width = 120;
+  static const double height = 120;
 
   final QResource qres;
   const QResourceWidget(this.qres, {Key? key}) : super(key: key);
@@ -48,6 +51,7 @@ class _QResourceWidgetState extends State<QResourceWidget> with TickerProviderSt
       child: GestureDetector(
         onTap: () => widget.qres.open(),
         onSecondaryTap: () => openChildren(widget.qres),
+        onSecondaryLongPress: () => openQResourceEditor(mode: QResourceEditorMode.editItem, qres: widget.qres),
 
         child: ScaleTransition(
           scale: animation,
@@ -55,6 +59,13 @@ class _QResourceWidgetState extends State<QResourceWidget> with TickerProviderSt
         ),
       ),
     );
+
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
 }
@@ -67,16 +78,57 @@ class _QResourceWidgetChild extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 140,
-      height: 140,
+      //color: Colors.blue,
+      width: QResourceWidget.width,
+      height: QResourceWidget.height,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.file(File(fileUtils.getIconFilePath(qres.image)), width: 64, height: 64, isAntiAlias: true, filterQuality: FilterQuality.high),
+          _buildImageWidget(),
           const SizedBox(height: 8),
-          Text(qres.name, style: TextStyle(color: Colors.black)),
+          _buildTextWidget(),
         ],
       ),
+    );
+  }
+
+  Widget _buildImageWidget() {
+
+    File imageFile = File(fileUtils.getIconFilePath(qres.image));
+    if(!imageFile.existsSync()) {
+      return Container(
+        width: 64,
+        height: 64,
+        color: Colors.red,
+      );
+    }
+
+    return Image.file(
+      imageFile,
+      width: 64,
+      height: 64,
+      isAntiAlias: true,
+      filterQuality: FilterQuality.high,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: 64,
+          height: 64,
+          color: Colors.red,
+        );
+      },
+    );
+  
+  }
+
+  Widget _buildTextWidget() {
+    return Text(
+      qres.name,
+      maxLines: 2,
+      softWrap: true,
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        color: Colors.black,
+      )
     );
   }
 
