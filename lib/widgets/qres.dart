@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quick_access/controllers/main_app.dart';
 import 'package:quick_access/models/qres.dart';
 
 import 'package:quick_access/utils/file_utils.dart' as fileUtils;
@@ -44,8 +45,12 @@ class _QResourceWidgetState extends State<QResourceWidget> with TickerProviderSt
   Widget build(BuildContext context) {
 
     return MouseRegion(
-      onEnter: (e) => animationController.forward(),
-      onExit: (e) => animationController.reverse(),
+      onEnter: (e) {
+        if(!Get.find<MainAppController>().isDragging) animationController.forward();
+      },
+      onExit: (e) {
+        if(!Get.find<MainAppController>().isDragging) animationController.reverse();
+      },
       cursor: SystemMouseCursors.click,
 
       child: GestureDetector(

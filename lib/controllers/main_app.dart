@@ -10,6 +10,7 @@ import 'package:quick_access/utils/file_utils.dart' as fileUtils;
 class MainAppController extends GetxController {
 
   List<QResource> items = [];
+  bool isDragging = false;
 
   @override
   void onInit() {

@@ -26,16 +26,23 @@ class QResourcesWidget extends StatelessWidget {
         width: cons.maxWidth,
         height: cons.maxHeight,
         child: GetBuilder<MainAppController>(
-          builder: (context) {
+          builder: (con) {
             return ReorderableWrap(
               needsLongPressDraggable: true,
               padding: const EdgeInsets.symmetric(vertical: vResourcesPadding, horizontal: hResourcesPadding),
-              onReorder: (oldIndex, newIndex) {
-                Get.find<MainAppController>().reorder(items, oldIndex, newIndex);
-              },
               spacing: horizontalSpacing,
               runSpacing: verticalSpacing,
+
+              onReorderStarted: (index) => con.isDragging = true,
+              onNoReorder: (index) => con.isDragging = false,
+
+              onReorder: (oldIndex, newIndex) {
+                con.isDragging = false;
+                Get.find<MainAppController>().reorder(items, oldIndex, newIndex);
+              },
+
               children: items.map(_qres2widget).toList(),
+
             );
           }
         ),

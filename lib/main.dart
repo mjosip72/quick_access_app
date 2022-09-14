@@ -20,8 +20,8 @@ void main() async{
     brightness: Brightness.light,
     primarySwatch: Colors.blue,
     //scaffoldBackgroundColor: const Color.fromRGBO(230, 230, 230, 0.6),
-    //scaffoldBackgroundColor: Colors.white.withOpacity(0.6),
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: Colors.white.withOpacity(0.6),
+    //scaffoldBackgroundColor: Colors.white,
     useMaterial3: true,
   );
 
