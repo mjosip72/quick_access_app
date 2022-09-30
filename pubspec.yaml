@@ -1,5 +1,5 @@
 name: quick_access
-description: Quick access is a Flutter app for quick opening applications, folders, websites, etc.
+description: Quick access
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.1
+version: 1.1.0
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
@@ -33,10 +33,19 @@ dependencies:
     sdk: flutter
 
   get: ^4.6.5
+
+  win_titlebar:
+    path: '../_packages/win_titlebar'
+  context_menus:
+    path: '../_packages/flutter_context_menu'
   reorderables:
-    git: https://github.com/mjosip72/flutter_reorderables.git
-  bitsdojo_window: ^0.1.4
+    git: '../_packages/flutter_reorderables'
+  
+  bitsdojo_window: ^0.1.5
   flutter_acrylic: ^1.0.0+2
+
+  #desktop_drop: ^0.3.3
+  #cross_file: ^0.3.3+2
   ffi: ^2.0.1
 
   # The following adds the Cupertino Icons font to your application.

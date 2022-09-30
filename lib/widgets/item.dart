@@ -1,29 +1,31 @@
 
 import 'dart:io';
 
+import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:quick_access/controllers/main_app.dart';
-import 'package:quick_access/models/qres.dart';
+import 'package:quick_access/models/item.dart';
 
 import 'package:quick_access/utils/file_utils.dart' as fileUtils;
-import 'package:quick_access/widgets/qres_container.dart';
-import 'package:quick_access/widgets/qres_editor.dart';
+import 'package:quick_access/widgets/context_menus.dart';
+import 'package:quick_access/widgets/dialogs.dart';
 
-class QResourceWidget extends StatefulWidget {
+class ItemWidget extends StatefulWidget {
 
   static const double width = 120;
   static const double height = 120;
 
-  final QResource qres;
-  const QResourceWidget(this.qres, {Key? key}) : super(key: key);
+  final Item item;
+  const ItemWidget(this.item, {Key? key}) : super(key: key);
 
   @override
-  State<QResourceWidget> createState() => _QResourceWidgetState();
+  State<ItemWidget> createState() => _ItemWidgetState();
 
 }
 
-class _QResourceWidgetState extends State<QResourceWidget> with TickerProviderStateMixin {
+class _ItemWidgetState extends State<ItemWidget> with TickerProviderStateMixin {
 
   late AnimationController animationController;
   late Animation<double> animation;
@@ -34,7 +36,7 @@ class _QResourceWidgetState extends State<QResourceWidget> with TickerProviderSt
 
     animationController = AnimationController(
       vsync: this,
-      duration: 80.milliseconds  
+      duration: 60.milliseconds  
     );
 
     animation = Tween<double>(begin: 1, end: 1.4).animate(animationController);
@@ -46,21 +48,31 @@ class _QResourceWidgetState extends State<QResourceWidget> with TickerProviderSt
 
     return MouseRegion(
       onEnter: (e) {
-        if(!Get.find<MainAppController>().isDragging) animationController.forward();
+        if(!MainAppController.instance.isDragging) animationController.forward();
       },
       onExit: (e) {
-        if(!Get.find<MainAppController>().isDragging) animationController.reverse();
+        if(!MainAppController.instance.isDragging) animationController.reverse();
       },
       cursor: SystemMouseCursors.click,
 
-      child: GestureDetector(
-        onTap: () => widget.qres.open(),
-        onSecondaryTap: () => openChildren(widget.qres),
-        onSecondaryLongPress: () => openQResourceEditor(mode: QResourceEditorMode.editItem, qres: widget.qres),
+      child: ContextMenuRegion(
+        contextMenu: widget.item.isParent ? ItemContextMenu(item: widget.item) : SubItemContextMenu(item: widget.item),
+        longPress: true,
 
-        child: ScaleTransition(
-          scale: animation,
-          child: _QResourceWidgetChild(widget.qres),
+        child: GestureDetector(
+
+          onTap: () {
+            widget.item.open();
+            bool shift = RawKeyboard.instance.keysPressed.contains(LogicalKeyboardKey.shiftLeft);
+            if(!shift) MainAppController.instance.onAppClose();
+          },
+
+          onSecondaryTap: () => openChildren(widget.item),
+
+          child: ScaleTransition(
+            scale: animation,
+            child: _ItemWidgetChild(widget.item),
+          ),
         ),
       ),
     );
@@ -75,17 +87,16 @@ class _QResourceWidgetState extends State<QResourceWidget> with TickerProviderSt
 
 }
 
-class _QResourceWidgetChild extends StatelessWidget {
+class _ItemWidgetChild extends StatelessWidget {
 
-  final QResource qres;
-  const _QResourceWidgetChild(this.qres, {Key? key}) : super(key: key);
+  final Item item;
+  const _ItemWidgetChild(this.item, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      //color: Colors.blue,
-      width: QResourceWidget.width,
-      height: QResourceWidget.height,
+      width: ItemWidget.width,
+      height: ItemWidget.height,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -99,7 +110,7 @@ class _QResourceWidgetChild extends StatelessWidget {
 
   Widget _buildImageWidget() {
 
-    File imageFile = File(fileUtils.getIconFilePath(qres.image));
+    File imageFile = File(fileUtils.iconFilePath(item.icon));
     if(!imageFile.existsSync()) {
       return Container(
         width: 64,
@@ -127,15 +138,18 @@ class _QResourceWidgetChild extends StatelessWidget {
 
   Widget _buildTextWidget() {
     return Text(
-      qres.name,
+      item.name,
       maxLines: 2,
       softWrap: true,
       textAlign: TextAlign.center,
-      style: const TextStyle(
-        color: Colors.black,
+      style: TextStyle(
+        color: Colors.white,
+        shadows: [
+          for(int i = 0; i < 12; i++)
+            const Shadow(color: Colors.black, blurRadius: 1, offset: Offset(0, 0)),
+        ]
       )
     );
   }
 
 }
-

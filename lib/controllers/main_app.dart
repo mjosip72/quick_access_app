@@ -4,12 +4,14 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart' as win;
 import 'package:get/get.dart';
-import 'package:quick_access/models/qres.dart';
+import 'package:quick_access/models/item.dart';
 import 'package:quick_access/utils/file_utils.dart' as fileUtils;
 
 class MainAppController extends GetxController {
 
-  List<QResource> items = [];
+  static MainAppController get instance => Get.find<MainAppController>();
+
+  List<Item> items = [];
   bool isDragging = false;
 
   @override
@@ -18,20 +20,41 @@ class MainAppController extends GetxController {
     _loadItems();
   }
 
-  void reorder(List<QResource> list, int oldIndex, int newIndex) {
+  void reorderItem(List<Item> list, int oldIndex, int newIndex) {
     markDirty();
     list.insert(newIndex, list.removeAt(oldIndex));
     update();
   }
 
-  void removeItem(QResource qres) {
-    
-    if(items.contains(qres)) {
-      items.remove(qres);
+  void duplicateItem(Item item) {
+
+    int index = items.indexOf(item);
+
+    if(index != -1) {
+      items.insert(index + 1, Item.copy(item));
     }else{
       for(var e in items) {
-        if(e.children.contains(qres)) {
-          e.children.remove(qres);
+        index = e.children.indexOf(item);
+        if(index != -1) {
+          e.children.insert(index + 1, Item.copy(item));
+          break;
+        }
+      }
+    }
+
+    markDirty();
+    update();
+
+  }
+
+  void removeItem(Item item) {
+    
+    if(items.contains(item)) {
+      items.remove(item);
+    }else{
+      for(var e in items) {
+        if(e.children.contains(item)) {
+          e.children.remove(item);
           break;
         }
       }
@@ -56,13 +79,13 @@ class MainAppController extends GetxController {
     var jsonList = items.map((e) => e.toJson()).toList();
     JsonEncoder encoder = const JsonEncoder.withIndent('\t');
     String json = encoder.convert(jsonList);
-    File(fileUtils.getResourceFilePath()).writeAsStringSync(json);
+    File(fileUtils.itemsFilePath()).writeAsStringSync(json);
   }
 
   void _loadItems() {
-    String source = File(fileUtils.getResourceFilePath()).readAsStringSync();
+    String source = File(fileUtils.itemsFilePath()).readAsStringSync();
     List<dynamic> list = jsonDecode(source);
-    items.addAll(list.map((e) => QResource.fromJson(e)).toList());
+    items.addAll(list.map((e) => Item.fromJson(e, isParent: true)).toList());
   }
 
   bool _isDirty = false;

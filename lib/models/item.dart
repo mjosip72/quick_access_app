@@ -1,27 +1,44 @@
 
 import 'package:quick_access/utils/shell32.dart' as shell32;
 
-class QResource {
+class Item {
 
   String name;
-  String image;
+  String icon;
 
   String program;
   String launchArguments;
   String workingDirectory;
 
-  List<QResource> children;
+  List<Item> children;
+  bool isParent;
 
-  QResource({
+  Item({
     required this.name,
-    required this.image,
+    required this.icon,
     required this.program,
     required this.launchArguments,
     required this.workingDirectory,
     required this.children,
+    required this.isParent,
   });
 
-  QResource.empty() : name = '', image = '', program = '', launchArguments = '', workingDirectory = '', children = [];
+  Item.copy(Item item) : 
+    name = item.name,
+    icon = item.icon,
+    program = item.program,
+    launchArguments = item.launchArguments,
+    workingDirectory = item.workingDirectory,
+    children = [],
+    isParent = item.isParent;
+
+  Item.empty({required this.isParent}) : 
+    name = '',
+    icon = '',
+    program = '',
+    launchArguments = '',
+    workingDirectory = '',
+    children = [];
 
   int open() {
     return shell32.shellExecute(
@@ -37,7 +54,7 @@ class QResource {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'icon': image,
+      'icon': icon,
       'app': program,
       'args': launchArguments,
       'dir': workingDirectory,
@@ -45,26 +62,27 @@ class QResource {
     };
   }
 
-  static QResource fromJson(Map<String, dynamic> map) {
-    return QResource(
+  static Item fromJson(Map<String, dynamic> map, {required bool isParent}) {
+    return Item(
       name: map.nonEmptyString('name'),
-      image: map.nonEmptyString('icon'),
+      icon: map.nonEmptyString('icon'),
       program: map.nonEmptyString('app'),
       launchArguments: map.nonEmptyString('args'),
       workingDirectory: map.nonEmptyString('dir'),
       children: _getChildren(map, 'children'),
+      isParent: isParent,
     );
   }
 
 }
 
-List<QResource> _getChildren(Map<String, dynamic> map, String key) {
+List<Item> _getChildren(Map<String, dynamic> map, String key) {
 
   if(!map.containsKey(key)) return [];
 
   dynamic value = map[key];
   if(value is List) {
-    return value.map((e) => QResource.fromJson(e)).toList();
+    return value.map((e) => Item.fromJson(e, isParent: false)).toList();
   }
 
   return [];

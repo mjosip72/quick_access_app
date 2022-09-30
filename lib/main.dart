@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:quick_access/screens/main_screen.dart';
 import 'controllers/main_app.dart';
+import 'package:win_titlebar/win_titlebar.dart';
 
 const appTitle = 'Quick access';
 
@@ -14,14 +14,12 @@ void main() async{
 
   WidgetsFlutterBinding.ensureInitialized();
   await Window.initialize();
-  await Window.setEffect(effect: WindowEffect.aero);
+  await Window.setEffect(effect: WindowEffect.transparent);
 
   ThemeData theme = ThemeData(
-    brightness: Brightness.light,
+    brightness: Brightness.dark,
     primarySwatch: Colors.blue,
-    //scaffoldBackgroundColor: const Color.fromRGBO(230, 230, 230, 0.6),
-    scaffoldBackgroundColor: Colors.white.withOpacity(0.6),
-    //scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: Colors.black.withOpacity(0.64),
     useMaterial3: true,
   );
 
@@ -29,17 +27,18 @@ void main() async{
     debugShowCheckedModeBanner: false,
     theme: theme,
     darkTheme: theme,
-    themeMode: ThemeMode.light,
+    themeMode: ThemeMode.dark,
     defaultTransition: Transition.noTransition,
     transitionDuration: 0.milliseconds,
     home: const MainPage(),
   ));
 
-  doWhenWindowReady(() {
-    appWindow.size = const Size(1280, 720);
-    appWindow.title = appTitle;
-    appWindow.alignment = Alignment.center;
-    appWindow.show();
-  });
+  initializeWindow(
+    title: appTitle,
+    onAppClose: () {
+      MainAppController.instance.onAppClose();
+      return true;
+    },
+  );
 
 }
