@@ -71,6 +71,7 @@ class _ItemWidgetState extends State<ItemWidget> with TickerProviderStateMixin {
 
           child: ScaleTransition(
             scale: animation,
+            filterQuality: FilterQuality.medium,
             child: _ItemWidgetChild(widget.item),
           ),
         ),
@@ -110,28 +111,16 @@ class _ItemWidgetChild extends StatelessWidget {
 
   Widget _buildImageWidget() {
 
-    File imageFile = File(fileUtils.iconFilePath(item.icon));
-    if(!imageFile.existsSync()) {
-      return Container(
-        width: 64,
-        height: 64,
-        color: Colors.red,
-      );
-    }
+    File? imageFile = fileUtils.iconFile(item.icon);
+    if(imageFile == null) return _buildErrorImage();
 
     return Image.file(
       imageFile,
       width: 64,
       height: 64,
       isAntiAlias: true,
-      filterQuality: FilterQuality.high,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          width: 64,
-          height: 64,
-          color: Colors.red,
-        );
-      },
+      filterQuality: FilterQuality.medium,
+      errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
     );
   
   }
@@ -149,6 +138,14 @@ class _ItemWidgetChild extends StatelessWidget {
             const Shadow(color: Colors.black, blurRadius: 1, offset: Offset(0, 0)),
         ]
       )
+    );
+  }
+
+  Widget _buildErrorImage() {
+    return Container(
+      width: 64,
+      height: 64,
+      color: Colors.red,
     );
   }
 

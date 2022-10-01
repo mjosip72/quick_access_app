@@ -1,10 +1,12 @@
 
+import 'dart:io';
+
 String get homeDir => 'C:\\Users\\josip\\Documents\\Quick access';
 
 String itemsFilePath() {
   return '$homeDir\\items.json';
 }
 
-String iconFilePath(String iconName) {
-  return '$homeDir\\icons\\$iconName';
+File? iconFile(String iconName) {
+  return File('$homeDir\\icons\\$iconName');
 }
